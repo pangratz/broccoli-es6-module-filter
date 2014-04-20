@@ -29,17 +29,6 @@ Filter.prototype.setOptions = function(options) {
   var merged = extend({}, this.defaults, options);
   this.options = rip(merged, ['moduleType', 'packageName', 'main']);
   this.compilerOptions = merged;
-  this.validateOptions();
-}
-
-Filter.prototype.validateOptions = function() {
-  if (
-    this.options.moduleType == 'amd' &&
-    this.compilerOptions.anonymous === false &&
-    !this.options.packageName
-  ) {
-    throw new Error('You must specify a `packageName` option when using the `anonymous: false` option');
-  }
 }
 
 var methods = {
@@ -54,7 +43,8 @@ Filter.prototype.getName = function (filePath) {
   var name = filePath.replace(/.js$/, '');
   var main = this.options.main;
   var packageName = this.options.packageName;
-  return name === main ? packageName : packageName+'/'+name;
+  var prefix = packageName ? (packageName + '/') : '';
+  return name === main ? packageName : (prefix + name);
 };
 
 Filter.prototype.processString = function (fileContents, filePath) {
@@ -72,4 +62,3 @@ function rip(obj, props) {
     return ripped;
   }, {});
 }
-
